@@ -31,11 +31,11 @@ import {
   Right,
   Button
 } from "native-base";
+import * as axios from "axios";
 
 type Props = {};
 const uniqueId = DeviceInfo.getUniqueID();
-var Room = "";
-const navitUID = "9d0a3fe609cae4f28a870004a3ccc3d710fdd403";
+const deviceName = DeviceInfo.getModel();
 //Beacons.detectIBeacons();
 Beacons.detectEstimotes();
 Beacons.startMonitoringForRegion({
@@ -70,6 +70,34 @@ export default class App extends Component<Props> {
       distance: "",
       counter: 0
     };
+
+    // fetch('http://facebook.github.io/react-native/movies.json')
+    //   .then((response) => response.json())
+    //   .then((responseJson) => {
+    //     return responseJson.movies;
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
+
+    fetch("http://52.42.15.246:4000/api/v1/user", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        firstName: deviceName,
+        lastName: deviceName,
+        userId: uniqueId
+      })
+    })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   componentDidMount() {
@@ -82,6 +110,23 @@ export default class App extends Component<Props> {
           if (this.state.room != currentRoom) {
             console.log("found beacons!", data.beacons, "Room 1");
             this.setState({ room: "Room1" });
+            fetch("http://52.42.15.246:4000/api/v1/userActivity", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                userId: uniqueId,
+                deviceId:(data.beacons[0].minor).toString()+(data.beacons[0].major).toString()
+              })
+            })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              });
           }
         } else if (
           data.beacons[0].minor == 49385 &&
@@ -91,6 +136,23 @@ export default class App extends Component<Props> {
           if (this.state.room != currentRoom) {
             console.log("found beacons!", data.beacons, "Room 2");
             this.setState({ room: "Room2" });
+            fetch("http://52.42.15.246:4000/api/v1/userActivity", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                userId: uniqueId,
+                deviceId:(data.beacons[0].minor).toString()+(data.beacons[0].major).toString()
+              })
+            })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              });
           }
         } else if (
           data.beacons[0].minor == 15000 &&
@@ -100,6 +162,23 @@ export default class App extends Component<Props> {
           if (this.state.room != currentRoom) {
             console.log("found beacons!", data.beacons, "Room 3");
             this.setState({ room: "Room3" });
+            fetch("http://52.42.15.246:4000/api/v1/userActivity", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                userId: uniqueId,
+                deviceId:(data.beacons[0].minor).toString()+(data.beacons[0].major).toString()
+              })
+            })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              });
           }
         }
       } else {
@@ -110,6 +189,19 @@ export default class App extends Component<Props> {
           if (this.state.room != currentRoom) {
             console.log("Not in range of any room");
             this.setState({ room: "No Room Assigned" });
+            fetch("http://52.42.15.246:4000/api/v1/userActivity/"+uniqueId, {
+              method: "DELETE",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+              }
+            })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              });
           }
         }
       }
@@ -120,7 +212,7 @@ export default class App extends Component<Props> {
     return (
       <Container>
         <Header padder>
-          <Body >
+          <Body>
             <Title>Beacon Tester</Title>
           </Body>
           <Right />
@@ -137,6 +229,16 @@ export default class App extends Component<Props> {
             </CardItem>
           </Card>
           <Card>
+            <CardItem header>
+              <Body>
+                <Text>Your Phone's Name</Text>
+              </Body>
+            </CardItem>
+            <CardItem>
+              <Text>{deviceName}</Text>
+            </CardItem>
+          </Card>
+          <Card>
             <CardItem>
               <Body>
                 <Body>
@@ -144,7 +246,7 @@ export default class App extends Component<Props> {
                 </Body>
                 <CardItem>
                   <Body>
-                  <Text>{this.state.room}</Text>
+                    <Text>{this.state.room}</Text>
                   </Body>
                 </CardItem>
               </Body>
@@ -170,16 +272,6 @@ export default class App extends Component<Props> {
                   )}
                 </CardItem>
               </Body>
-            </CardItem>
-          </Card>
-          <Card>
-            <CardItem header>
-              <Body>
-                <Text>BY TEAM ROCKET</Text>
-              </Body>
-            </CardItem>
-            <CardItem>
-              <Text>SUBSCRIBE TO T-SERIES</Text>
             </CardItem>
           </Card>
         </Content>
